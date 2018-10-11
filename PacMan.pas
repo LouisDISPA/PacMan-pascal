@@ -37,10 +37,25 @@ procedure mouvement(n : Niveau; var pos : TableauPos; var dir : TableauDir);
 Begin
   {Mouvenement pacman}
   case dir[0] of
-    1 : if (pos[0].y <> 0) then if (n.tab[pos[0].x ,pos[0].y - 1] <= 1) and ( not(fantome(pos, pos[0].x, pos[0].y-1)) ) then pos[0].y := pos[0].y - 1 else dir[0] := 0;
-    2 : if (pos[0].x <> n.xMax-1) then if (n.tab[pos[0].x + 1 ,pos[0].y] <= 1) and ( not(fantome(pos, pos[0].x+1, pos[0].y)) ) then pos[0].x := pos[0].x + 1 else dir[0] := 0;
-    3 : if (pos[0].y <> n.yMax-1) then if (n.tab[pos[0].x ,pos[0].y + 1] <= 1) and ( not(fantome(pos, pos[0].x, pos[0].y+1)) ) then pos[0].y := pos[0].y + 1 else dir[0] := 0;
-    4 : if (pos[0].x <> 0) then if (n.tab[pos[0].x - 1 ,pos[0].y] <= 1) and ( not(fantome(pos, pos[0].x-1, pos[0].y)) ) then pos[0].x := pos[0].x - 1 else dir[0] := 0;
+    1 : if (pos[0].y <> 0) then
+      if (n.tab[pos[0].x ,pos[0].y - 1] <= 1) and ( not(fantome(pos, pos[0].x, pos[0].y-1)) ) then
+        pos[0].y := pos[0].y - 1
+      else dir[0] := 0;
+
+    2 : if (pos[0].x <> n.xMax-1) then
+      if (n.tab[pos[0].x + 1 ,pos[0].y] <= 1) and ( not(fantome(pos, pos[0].x+1, pos[0].y)) ) then
+        pos[0].x := pos[0].x + 1
+      else dir[0] := 0;
+
+    3 : if (pos[0].y <> n.yMax-1) then
+      if (n.tab[pos[0].x ,pos[0].y + 1] <= 1) and ( not(fantome(pos, pos[0].x, pos[0].y+1)) ) then
+        pos[0].y := pos[0].y + 1
+      else dir[0] := 0;
+
+    4 : if (pos[0].x <> 0) then
+      if (n.tab[pos[0].x - 1 ,pos[0].y] <= 1) and ( not(fantome(pos, pos[0].x-1, pos[0].y)) ) then
+        pos[0].x := pos[0].x - 1
+      else dir[0] := 0;
   end;
 
 
@@ -66,6 +81,16 @@ begin
       End;
     writeln(str);
   end;
+
+  gotoXY(pos[0].x + 1,pos[0].y + 1);
+  write('C');
+
+  for i := 1 to 4 do
+  begin
+    gotoXY(pos[i].x + 1,pos[i].y + 1);
+    write('M');
+  end;
+  gotoXY(1,map.yMax)
 end;
 
 
@@ -110,15 +135,16 @@ begin
       for i := 0 to 5 do
       begin
         read(fic,p);
-        pos[0].x := p;
+        pos[i].x := p;
         readln(fic,P);
-        pos[0].x := p;
+        pos[i].y := p;
       end;
+
+    close(fic);
    end
    else
    begin
       writeln('Erreur le fichier n''existe pas');
-      halt();
    end;
 end;
 
@@ -163,7 +189,7 @@ BEGIN
     begin
       Mouvement(niv,pos,dir);
       {Interaction(niv,pos,score,vie,bonus,fin);}
-      {affichage(niv,pos);}
+      affichage(niv,pos);
     end;
 
     if Keypressed then

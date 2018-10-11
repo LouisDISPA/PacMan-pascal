@@ -239,7 +239,7 @@ BEGIN
   clrscr;
   while not(fin) do
   begin
-    if temps mod 2 = 0 then
+    if temps mod 3 = 0 then
     begin
       Mouvement(niv,pos,dir);
       {Interaction(niv,pos,score,vie,bonus,fin);}
@@ -257,7 +257,7 @@ BEGIN
       end;
     end;
 
-    delay(200);
+    delay(100);
     temps := temps + 1;
   end;
 END.

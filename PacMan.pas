@@ -18,47 +18,54 @@ TYPE
   END;
 
 
-
-{ retourne vrai si il y a un fantome en [x,y] }
-function fantome(pos : TableauPos; x,y : byte) : boolean;
+function contact(n : Niveau;pos : TableauPos; x,y : byte): boolean;
 var
   i : byte;
-  fant : boolean;
+  con : boolean;
 begin
-  fant := false;
-  for i := 1 to 4 do
-      if (pos[i].x = x) and (pos[i].y = y) then
-        fant := true;
-  fantome := fant;
+  con := false;
+
+  if (n.tab[x ,y] <= 1) then {si il n'y a pas de mur ni de porte ni}
+    con := true
+  else
+    for i := 1 to 4 do
+        if (pos[i].x = x) and (pos[i].y = y) then {ni de fantomes}
+          con := true;
+
+  contact := con;
 end;
 
-
 procedure mouvement(n : Niveau; var pos : TableauPos; var dir : TableauDir);
+var
+  i: BYTE;
 Begin
   {Mouvenement pacman}
   case dir[0] of
-    1 : if (pos[0].y <> 0) then
-      if (n.tab[pos[0].x ,pos[0].y - 1] > 1) and ( not(fantome(pos, pos[0].x, pos[0].y-1)) ) then
+    1 : if (pos[0].y <> 0) then {check si extrémité (inutile si il y a bien un mur sur les bordures)}
+      if not(contact(n, pos, pos[0].x, pos[0].y - 1)) then {si il n'y a pas de mur ni de porte ni de fantome, pacaman peut aller sur la case}
         pos[0].y := pos[0].y - 1
-      else dir[0] := 0;
+      else dir[0] := 0; {sinon il s'arrête}
 
     2 : if (pos[0].x <> n.xMax-1) then
-      if (n.tab[pos[0].x + 1 ,pos[0].y] > 1) and ( not(fantome(pos, pos[0].x+1, pos[0].y)) ) then
+      if not(contact(n, pos, pos[0].x + 1, pos[0].y)) then
         pos[0].x := pos[0].x + 1
       else dir[0] := 0;
 
     3 : if (pos[0].y <> n.yMax-1) then
-      if (n.tab[pos[0].x ,pos[0].y + 1] > 1) and ( not(fantome(pos, pos[0].x, pos[0].y+1)) ) then
+      if not(contact(n, pos, pos[0].x ,pos[0].y + 1)) then
         pos[0].y := pos[0].y + 1
       else dir[0] := 0;
 
     4 : if (pos[0].x <> 0) then
-      if (n.tab[pos[0].x - 1 ,pos[0].y] > 1) and ( not(fantome(pos, pos[0].x-1, pos[0].y)) ) then
+      if not(contact(n, pos, pos[0].x - 1 ,pos[0].y)) then
         pos[0].x := pos[0].x - 1
       else dir[0] := 0;
   end;
 
-
+  {Mouvement fantomes}
+  for i := 1 to 4 do
+  begin
+  end;
 end;
 
 procedure affichage(map : Niveau; pos : TableauPos);

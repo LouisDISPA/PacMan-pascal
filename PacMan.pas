@@ -49,20 +49,22 @@ end;
 procedure affichage(map : Niveau; pos : TableauPos);
 var
   i,j : integer;
+  str : STRING;
 begin
   clrscr;
-  For i:= 1 to map.yMax-1 do
+  For i:= 0 to map.yMax-1 do
   Begin
-    For j:= 1 to map.xMax-1 do
+    str := '';
+    For j:= 0 to map.xMax-1 do
       Case map.tab[j,i] of
-        0 : write('#');
-        1 : write('+');
-        2 : write(' ');
-        3 : write('.');
-        4 : write('¤');
-        5 : write('Q');
+        0 : str := str + '#';
+        1 : str := str + '+';
+        2 : str := str + ' ';
+        3 : str := str + '.';
+        4 : str := str + 'o';
+        5 : str := str + 'Q';
       End;
-    writeln;
+    writeln(str);
   end;
 end;
 
@@ -85,7 +87,6 @@ begin
       if (map.xMax > 50) or (map.yMax > 50) then
       begin
         writeln('Tailles invalides');
-        halt();
       end;
 
       for j := 0 to map.yMax-1 do
@@ -114,7 +115,6 @@ begin
         pos[0].x := p;
       end;
    end
-
    else
    begin
       writeln('Erreur le fichier n''existe pas');
@@ -152,6 +152,7 @@ BEGIN
   score := 0;
   bonus := false;
   fin := false;
+
   affichage(niv,pos);
 
   delay(3000);
@@ -162,7 +163,7 @@ BEGIN
     begin
       Mouvement(niv,pos,dir);
       {Interaction(niv,pos,score,vie,bonus,fin);}
-      affichage(niv,pos);
+      {affichage(niv,pos);}
     end;
 
     if Keypressed then

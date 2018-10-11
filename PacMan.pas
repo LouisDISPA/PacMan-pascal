@@ -38,22 +38,22 @@ Begin
   {Mouvenement pacman}
   case dir[0] of
     1 : if (pos[0].y <> 0) then
-      if (n.tab[pos[0].x ,pos[0].y - 1] <= 1) and ( not(fantome(pos, pos[0].x, pos[0].y-1)) ) then
+      if (n.tab[pos[0].x ,pos[0].y - 1] > 1) and ( not(fantome(pos, pos[0].x, pos[0].y-1)) ) then
         pos[0].y := pos[0].y - 1
       else dir[0] := 0;
 
     2 : if (pos[0].x <> n.xMax-1) then
-      if (n.tab[pos[0].x + 1 ,pos[0].y] <= 1) and ( not(fantome(pos, pos[0].x+1, pos[0].y)) ) then
+      if (n.tab[pos[0].x + 1 ,pos[0].y] > 1) and ( not(fantome(pos, pos[0].x+1, pos[0].y)) ) then
         pos[0].x := pos[0].x + 1
       else dir[0] := 0;
 
     3 : if (pos[0].y <> n.yMax-1) then
-      if (n.tab[pos[0].x ,pos[0].y + 1] <= 1) and ( not(fantome(pos, pos[0].x, pos[0].y+1)) ) then
+      if (n.tab[pos[0].x ,pos[0].y + 1] > 1) and ( not(fantome(pos, pos[0].x, pos[0].y+1)) ) then
         pos[0].y := pos[0].y + 1
       else dir[0] := 0;
 
     4 : if (pos[0].x <> 0) then
-      if (n.tab[pos[0].x - 1 ,pos[0].y] <= 1) and ( not(fantome(pos, pos[0].x-1, pos[0].y)) ) then
+      if (n.tab[pos[0].x - 1 ,pos[0].y] > 1) and ( not(fantome(pos, pos[0].x-1, pos[0].y)) ) then
         pos[0].x := pos[0].x - 1
       else dir[0] := 0;
   end;
@@ -196,10 +196,10 @@ BEGIN
     Begin
       k := ReadKey;
       case k of
-        #75 : dir[0] := 1;
-        #76 : dir[0] := 2;
-        #77 : dir[0] := 3;
-        #78 : dir[0] := 4;
+        #72 : if (niv.tab[pos[0].x ,pos[0].y - 1] > 1) then dir[0] := 1; {haut}
+        #77 : if (niv.tab[pos[0].x + 1 ,pos[0].y] > 1) then dir[0] := 2; {droite}
+        #80 : if (niv.tab[pos[0].x ,pos[0].y + 1] > 1) then dir[0] := 3; {bas}
+        #75 : if (niv.tab[pos[0].x - 1 ,pos[0].y] > 1) then dir[0] := 4; {gauche}
       end;
     end;
 

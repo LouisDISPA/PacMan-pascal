@@ -115,7 +115,7 @@ var
   i,j : integer;
   str : STRING;
 begin
-  clrscr;
+  gotoXY(1,1);
 
   {affiche le tableau}
   For i:= 0 to map.yMax-1 do
@@ -236,7 +236,7 @@ BEGIN
   affichage(niv,pos);
 
   delay(3000);
-
+  clrscr;
   while not(fin) do
   begin
     if temps mod 2 = 0 then

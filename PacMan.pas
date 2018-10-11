@@ -35,36 +35,78 @@ begin
   contact := con;
 end;
 
+procedure avance(n : niveau; var pos : TableauPos; var dir : TableauDir; i : byte);
+begin
+  case dir[i] of
+    1 : if (pos[i].y <> 0) then {check si extrémité (inutile si il y a bien un mur sur les bordures)}
+      if not(contact(n, pos, pos[i].x, pos[i].y - 1)) then {si il n'y a pas de mur ni de porte ni de fantome}
+        pos[i].y := pos[i].y - 1
+      else dir[i] := 0; {sinon il s'arrête}
+
+    2 : if (pos[i].x <> n.xMax-1) then
+      if not(contact(n, pos, pos[i].x + 1, pos[i].y)) then
+        pos[i].x := pos[i].x + 1
+      else dir[i] := 0;
+
+    3 : if (pos[i].y <> n.yMax-1) then
+      if not(contact(n, pos, pos[i].x ,pos[i].y + 1)) then
+        pos[i].y := pos[i].y + 1
+      else dir[i] := 0;
+
+    4 : if (pos[i].x <> 0) then
+      if not(contact(n, pos, pos[i].x - 1 ,pos[i].y)) then
+        pos[i].x := pos[i].x - 1
+      else dir[i] := 0;
+  end;
+end;
+
+function proxi(n : Niveau; pos : TableauPos; i : byte): byte;
+var
+  sum: byte;
+begin
+  sum := 0;
+
+  if (pos[i].y <> 0) then {check si extrémité (inutile si il y a bien un mur sur les bordures)}
+    if not(contact(n, pos, pos[i].x, pos[i].y - 1)) then {si il n'y a pas de mur ni de porte ni de fantome}
+      sum := sum + 1;
+
+  if (pos[i].x <> n.xMax-1) then
+    if not(contact(n, pos, pos[i].x + 1, pos[i].y)) then
+      sum := sum + 1;
+
+  if (pos[i].y <> n.yMax-1) then
+    if not(contact(n, pos, pos[i].x ,pos[i].y + 1)) then
+      sum := sum + 1;
+
+  if (pos[i].x <> 0) then
+    if not(contact(n, pos, pos[i].x - 1 ,pos[i].y)) then
+      sum := sum + 1;
+
+  proxi := sum;
+end;
+
+function choisir_dir(n : Niveau; pos : TableauPos; i : byte): byte;
+var
+  dir : byte;
+begin
+  dir := random(4) + 1;
+
+  choisir_dir := dir;
+end;
+
 procedure mouvement(n : Niveau; var pos : TableauPos; var dir : TableauDir);
 var
   i: BYTE;
 Begin
   {Mouvenement pacman}
-  case dir[0] of
-    1 : if (pos[0].y <> 0) then {check si extrémité (inutile si il y a bien un mur sur les bordures)}
-      if not(contact(n, pos, pos[0].x, pos[0].y - 1)) then {si il n'y a pas de mur ni de porte ni de fantome, pacaman peut aller sur la case}
-        pos[0].y := pos[0].y - 1
-      else dir[0] := 0; {sinon il s'arrête}
-
-    2 : if (pos[0].x <> n.xMax-1) then
-      if not(contact(n, pos, pos[0].x + 1, pos[0].y)) then
-        pos[0].x := pos[0].x + 1
-      else dir[0] := 0;
-
-    3 : if (pos[0].y <> n.yMax-1) then
-      if not(contact(n, pos, pos[0].x ,pos[0].y + 1)) then
-        pos[0].y := pos[0].y + 1
-      else dir[0] := 0;
-
-    4 : if (pos[0].x <> 0) then
-      if not(contact(n, pos, pos[0].x - 1 ,pos[0].y)) then
-        pos[0].x := pos[0].x - 1
-      else dir[0] := 0;
-  end;
+  avance(n,pos,dir,0);
 
   {Mouvement fantomes}
   for i := 1 to 4 do
   begin
+    if ( dir[i] = 0 ) or ( proxi(n, pos, i) > 2 ) then {si le fantome est arreté ou qu'il est dans une intersection}
+      dir[i] := choisir_dir(n, pos, i); {il réflechi pour Choisir ça direction}
+      avance(n,pos,dir,i);
   end;
 end;
 
@@ -74,6 +116,8 @@ var
   str : STRING;
 begin
   clrscr;
+
+  {affiche le tableau}
   For i:= 0 to map.yMax-1 do
   Begin
     str := '';
@@ -89,9 +133,11 @@ begin
     writeln(str);
   end;
 
+  {affiche PacMan}
   gotoXY(pos[0].x + 1,pos[0].y + 1);
   write('C');
 
+  {affiche les fantomes}
   for i := 1 to 4 do
   begin
     gotoXY(pos[i].x + 1,pos[i].y + 1);
@@ -168,6 +214,7 @@ var
   k : char;
 
 BEGIN
+  Randomize;
   clrscr;
   WriteLn('*********************************************');
   WriteLn('*** Bienvenue sur PacMan le Jeu de Pacman ***');
@@ -192,7 +239,7 @@ BEGIN
 
   while not(fin) do
   begin
-    if temps mod 5 = 0 then
+    if temps mod 2 = 0 then
     begin
       Mouvement(niv,pos,dir);
       {Interaction(niv,pos,score,vie,bonus,fin);}
@@ -210,7 +257,7 @@ BEGIN
       end;
     end;
 
-    delay(100);
+    delay(200);
     temps := temps + 1;
   end;
 END.

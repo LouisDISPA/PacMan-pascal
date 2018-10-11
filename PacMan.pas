@@ -13,7 +13,7 @@ TYPE
   TableauDir = array[0..4] of Byte; { 0 = pas de direction , 1 = haut , 2 = droite , 3 = bas , 4 = gauche }
 
   Niveau = RECORD
-    tab : array[0..49,0..49] of Byte; {( mur = 0  , vide = 1 , piece = 2  , bonbon = 3 , cerise = 4 )}
+    tab : array[0..49,0..49] of Byte; {( mur = 0  , porte = 1 , vide = 2 , piece = 3  , bonbon = 4 , Cerise = 5)}
     xMax, yMax : byte; { taille Max 50 sur 50 }
   END;
 
@@ -37,10 +37,10 @@ procedure mouvement(n : Niveau; var pos : TableauPos; var dir : TableauDir);
 Begin
   {Mouvenement pacman}
   case dir[0] of
-    1 : if (pos[0].y <> 0) then if (n.tab[pos[0].x ,pos[0].y - 1] <> 0) and ( not(fantome(pos, pos[0].x, pos[0].y-1)) ) then pos[0].y := pos[0].y - 1 else dir[0] := 0;
-    2 : if (pos[0].x <> n.xMax-1) then if (n.tab[pos[0].x + 1 ,pos[0].y] <> 0) and ( not(fantome(pos, pos[0].x+1, pos[0].y)) ) then pos[0].x := pos[0].x + 1 else dir[0] := 0;
-    3 : if (pos[0].y <> n.yMax-1) then if (n.tab[pos[0].x ,pos[0].y + 1] <> 0) and ( not(fantome(pos, pos[0].x, pos[0].y+1)) ) then pos[0].y := pos[0].y + 1 else dir[0] := 0;
-    4 : if (pos[0].x <> 0) then if (n.tab[pos[0].x - 1 ,pos[0].y] <> 0) and ( not(fantome(pos, pos[0].x-1, pos[0].y)) ) then pos[0].x := pos[0].x - 1 else dir[0] := 0;
+    1 : if (pos[0].y <> 0) then if (n.tab[pos[0].x ,pos[0].y - 1] <= 1) and ( not(fantome(pos, pos[0].x, pos[0].y-1)) ) then pos[0].y := pos[0].y - 1 else dir[0] := 0;
+    2 : if (pos[0].x <> n.xMax-1) then if (n.tab[pos[0].x + 1 ,pos[0].y] <= 1) and ( not(fantome(pos, pos[0].x+1, pos[0].y)) ) then pos[0].x := pos[0].x + 1 else dir[0] := 0;
+    3 : if (pos[0].y <> n.yMax-1) then if (n.tab[pos[0].x ,pos[0].y + 1] <= 1) and ( not(fantome(pos, pos[0].x, pos[0].y+1)) ) then pos[0].y := pos[0].y + 1 else dir[0] := 0;
+    4 : if (pos[0].x <> 0) then if (n.tab[pos[0].x - 1 ,pos[0].y] <= 1) and ( not(fantome(pos, pos[0].x-1, pos[0].y)) ) then pos[0].x := pos[0].x - 1 else dir[0] := 0;
   end;
 
 
@@ -50,34 +50,39 @@ procedure affichage(map : Niveau; pos : TableauPos);
 var
   i,j : integer;
 begin
+  clrscr;
   For i:= 1 to map.yMax-1 do
   Begin
     For j:= 1 to map.xMax-1 do
       Case map.tab[j,i] of
         0 : write('#');
-        1 : write(' ');
-        2 : write('.');
-        3 : write('¤');
-        4 : write('Q');
+        1 : write('+');
+        2 : write(' ');
+        3 : write('.');
+        4 : write('¤');
+        5 : write('Q');
       End;
-
+    writeln;
   end;
 end;
 
 
 
-procedure chargement(name : string; var n : Niveau;var pos : TableauPos);
-var fic        : Text;
-   i, j        : Integer;
-   str        : string;
+procedure chargement(niv : string; var map : Niveau;var pos : TableauPos);
+var
+  fic : Text;
+  p : byte;
+  i, j : Integer;
+  str, name : string;
 begin
+  name := niv + '.niv';
    if (FileExists(name)) then
    begin
       assign(fic,name);
       reset(fic);
-      read(fic,n.xMax);
-      readln(fic,n.yMax);
-      if (n.xMax > 50) or (n.yMax > 50) then
+      read(fic,map.xMax);
+      readln(fic,map.yMax);
+      if (map.xMax > 50) or (map.yMax > 50) then
       begin
         writeln('Tailles invalides');
         halt();
@@ -87,18 +92,27 @@ begin
       while (not eof(fic)) do
       begin
        readln(fic,str);
-       for i := 0 to n.xMax-1 do
+       for i := 0 to map.xMax-1 do
           if (str[i] = '0') then
-            n.tab[i][j] := 0
+            map.tab[i][j] := 0
           else if (str[i] = '1') then
-            n.tab[i][j] := 1
+            map.tab[i][j] := 1
           else if (str[i] = '2') then
-            n.tab[i][j] := 2
+            map.tab[i][j] := 2
           else if (str[i] = '3') then
-            n.tab[i][j] := 3
+            map.tab[i][j] := 3
+          else if (str[i] = '4') then
+            map.tab[i][j] := 4
           else
             Writeln('erreur chargement tableau');
        j := j+1;
+      end;
+      for i := 0 to 5 do
+      begin
+        read(p);
+        pos[0].x := p;
+        readln(P);
+        pos[0].x := p;
       end;
    end
 
@@ -122,6 +136,7 @@ var
   k : char;
 
 BEGIN
+  clrscr;
   WriteLn('*********************************************');
   WriteLn('*** Bienvenue sur PacMan le Jeu de Pacman ***');
   WriteLn('*********************************************');

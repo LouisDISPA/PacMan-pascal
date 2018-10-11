@@ -88,30 +88,29 @@ begin
         halt();
       end;
 
-      j := 0;
-      while (not eof(fic)) do
+      for j := 0 to map.yMax-1 do
       begin
        readln(fic,str);
        for i := 0 to map.xMax-1 do
-          if (str[i] = '0') then
+          if (str[i+1] = '0') then
             map.tab[i][j] := 0
-          else if (str[i] = '1') then
+          else if (str[i+1] = '1') then
             map.tab[i][j] := 1
-          else if (str[i] = '2') then
+          else if (str[i+1] = '2') then
             map.tab[i][j] := 2
-          else if (str[i] = '3') then
+          else if (str[i+1] = '3') then
             map.tab[i][j] := 3
-          else if (str[i] = '4') then
+          else if (str[i+1] = '4') then
             map.tab[i][j] := 4
           else
-            Writeln('erreur chargement tableau');
-       j := j+1;
+            Write('erreur chargement tableau  ');
       end;
+
       for i := 0 to 5 do
       begin
-        read(p);
+        read(fic,p);
         pos[0].x := p;
-        readln(P);
+        readln(fic,P);
         pos[0].x := p;
       end;
    end

@@ -16,10 +16,12 @@ TYPE
     tab : array[0..49,0..49] of Byte; {( mur = 0  , porte = 1 , vide = 2 , piece = 3  , bonbon = 4 , Cerise = 5)}
     xMax, yMax : byte; { taille Max 50 sur 50 }
     pos_start : tableauPos;
+    pos : tableauPos;
+    nb_piece : integer;
   END;
 
 
-function contact(n : Niveau;pos : TableauPos; x,y : byte): boolean;
+function contact(n : Niveau; x,y : byte): boolean;
 var
   i : byte;
   con : boolean;
@@ -30,63 +32,63 @@ begin
     con := true
   else
     for i := 1 to 4 do
-        if (pos[i].x = x) and (pos[i].y = y) then {ni de fantomes}
+        if (n.pos[i].x = x) and (n.pos[i].y = y) then {ni de fantomes}
           con := true;
 
   contact := con;
 end;
 
-procedure avance(n : niveau; var pos : TableauPos; var dir : TableauDir; i : byte);
+procedure avance(var n : niveau; var dir : TableauDir; i : byte);
 begin
   case dir[i] of
-    1 : if (pos[i].y <> 0) then {check si extrémité (inutile si il y a bien un mur sur les bordures)}
-      if not(contact(n, pos, pos[i].x, pos[i].y - 1)) then {si il n'y a pas de mur ni de porte ni de fantome}
-        pos[i].y := pos[i].y - 1
+    1 : if (n.pos[i].y <> 0) then {check si extrémité (inutile si il y a bien un mur sur les bordures)}
+      if not(contact(n, n.pos[i].x, n.pos[i].y - 1)) then {si il n'y a pas de mur ni de porte ni de fantome}
+        n.pos[i].y := n.pos[i].y - 1
       else dir[i] := 0; {sinon il s'arrête}
 
-    2 : if (pos[i].x <> n.xMax-1) then
-      if not(contact(n, pos, pos[i].x + 1, pos[i].y)) then
-        pos[i].x := pos[i].x + 1
+    2 : if (n.pos[i].x <> n.xMax-1) then
+      if not(contact(n, n.pos[i].x + 1, n.pos[i].y)) then
+        n.pos[i].x := n.pos[i].x + 1
       else dir[i] := 0;
 
-    3 : if (pos[i].y <> n.yMax-1) then
-      if not(contact(n, pos, pos[i].x ,pos[i].y + 1)) then
-        pos[i].y := pos[i].y + 1
+    3 : if (n.pos[i].y <> n.yMax-1) then
+      if not(contact(n, n.pos[i].x ,n.pos[i].y + 1)) then
+        n.pos[i].y := n.pos[i].y + 1
       else dir[i] := 0;
 
-    4 : if (pos[i].x <> 0) then
-      if not(contact(n, pos, pos[i].x - 1 ,pos[i].y)) then
-        pos[i].x := pos[i].x - 1
+    4 : if (n.pos[i].x <> 0) then
+      if not(contact(n, n.pos[i].x - 1 ,n.pos[i].y)) then
+        n.pos[i].x := n.pos[i].x - 1
       else dir[i] := 0;
   end;
 end;
 
-function proxi(n : Niveau; pos : TableauPos; i : byte): byte;
+function proxi(n : Niveau; i : byte): byte;
 var
   sum: byte;
 begin
   sum := 0;
 
-  if (pos[i].y <> 0) then {check si extrémité (inutile si il y a bien un mur sur les bordures)}
-    if not(contact(n, pos, pos[i].x, pos[i].y - 1)) then {si il n'y a pas de mur ni de porte ni de fantome}
+  if (n.pos[i].y <> 0) then {check si extrémité (inutile si il y a bien un mur sur les bordures)}
+    if not(contact(n, n.pos[i].x, n.pos[i].y - 1)) then {si il n'y a pas de mur ni de porte ni de fantome}
       sum := sum + 1;
 
-  if (pos[i].x <> n.xMax-1) then
-    if not(contact(n, pos, pos[i].x + 1, pos[i].y)) then
+  if (n.pos[i].x <> n.xMax-1) then
+    if not(contact(n, n.pos[i].x + 1, n.pos[i].y)) then
       sum := sum + 1;
 
-  if (pos[i].y <> n.yMax-1) then
-    if not(contact(n, pos, pos[i].x ,pos[i].y + 1)) then
+  if (n.pos[i].y <> n.yMax-1) then
+    if not(contact(n, n.pos[i].x ,n.pos[i].y + 1)) then
       sum := sum + 1;
 
-  if (pos[i].x <> 0) then
-    if not(contact(n, pos, pos[i].x - 1 ,pos[i].y)) then
+  if (n.pos[i].x <> 0) then
+    if not(contact(n, n.pos[i].x - 1 ,n.pos[i].y)) then
       sum := sum + 1;
 
   proxi := sum;
 end;
 
-function choisir_dir(n : Niveau; pos : TableauPos; i : byte; bonus : boolean): byte;
+function choisir_dir(n : Niveau; i : byte; bonus : boolean): byte;
 var
   dir : byte;
 begin
@@ -95,23 +97,23 @@ begin
   choisir_dir := dir;
 end;
 
-procedure mouvement(n : Niveau; var pos : TableauPos; var dir : TableauDir; bonus : boolean);
+procedure mouvement(var n : Niveau; var dir : TableauDir; bonus : boolean);
 var
   i: BYTE;
 Begin
   {Mouvenement pacman}
-  avance(n,pos,dir,0);
+  avance(n,dir,0);
 
   {Mouvement fantomes}
   for i := 1 to 4 do
   begin
-    if ( dir[i] = 0 ) or ( proxi(n, pos, i) > 2 ) then {si le fantome est arreté ou qu'il est dans une intersection}
-      dir[i] := choisir_dir(n, pos, i, bonus); {il réflechi pour Choisir ça direction}
-      avance(n,pos,dir,i);
+    if ( dir[i] = 0 ) or ( proxi(n, i) > 2 ) then {si le fantome est arreté ou qu'il est dans une intersection}
+      dir[i] := choisir_dir(n, i, bonus); {il réflechi pour Choisir ça direction}
+      avance(n,dir,i);
   end;
 end;
 
-procedure affichage(map : Niveau; pos : TableauPos);
+procedure affichage(map : Niveau);
 var
   i,j : integer;
   str : STRING;
@@ -135,13 +137,13 @@ begin
   end;
 
   {affiche PacMan}
-  gotoXY(pos[0].x + 1,pos[0].y + 1);
+  gotoXY(map.pos[0].x + 1,map.pos[0].y + 1);
   write('C');
 
   {affiche les fantomes}
   for i := 1 to 4 do
   begin
-    gotoXY(pos[i].x + 1,pos[i].y + 1);
+    gotoXY(map.pos[i].x + 1,map.pos[i].y + 1);
     write('M');
   end;
   gotoXY(1,map.yMax)
@@ -202,12 +204,12 @@ begin
 end;
 
 
-procedure interaction(var n : niveau;var pos : tableauPos; var score : integer; var vie : byte; var bonus : boolean; var fin : byte);
+procedure interaction(var n : niveau; var score : integer; var vie : byte; var bonus : boolean; var fin : byte);
 var
   p : vect;
   i : byte;
 begin
-  p := pos[0];
+  p := n.pos[0];
   case n.tab[p.x, p.y] of
     3 : score := score + 1;
 	  4 : bonus := true;
@@ -216,9 +218,9 @@ begin
   n.tab[p.x, p.y] := 2;
 
   for i := 1 to 4 do
-    if (p.x = pos[i].x) and (p.y = pos[i].y) then
+    if (p.x = n.pos[i].x) and (p.y = n.pos[i].y) then
       if bonus then
-        pos[i] := n.pos_start[i]
+        n.pos[i] := n.pos_start[i]
       else
         fin := 1;
 
@@ -227,7 +229,6 @@ end;
 var
   select : STRING;
   niv : Niveau;
-  pos : TableauPos;
   dir : TableauDir;
   bonus : boolean;
   vie, fin, i : byte; {fin = 0 : la partie est en cours || fin = 1 : mange par un fantome || fin = 2 : manger tout les pièces}
@@ -262,10 +263,10 @@ BEGIN
     fin := 0;
     temps := 0;
 
-    pos := niv.pos_start;
+    niv.pos := niv.pos_start;
     for i := 0 to 4 do dir[i] := 0;
 
-    affichage(niv,pos);
+    affichage(niv);
 
     delay(3000);
 
@@ -276,19 +277,19 @@ BEGIN
       Begin
         k := ReadKey;
         case k of
-          #72 : if (niv.tab[pos[0].x ,pos[0].y - 1] > 1) then dir[0] := 1; {haut}
-          #77 : if (niv.tab[pos[0].x + 1 ,pos[0].y] > 1) then dir[0] := 2; {droite}
-          #80 : if (niv.tab[pos[0].x ,pos[0].y + 1] > 1) then dir[0] := 3; {bas}
-          #75 : if (niv.tab[pos[0].x - 1 ,pos[0].y] > 1) then dir[0] := 4; {gauche}
+          #72 : if (niv.tab[niv.pos[0].x ,niv.pos[0].y - 1] > 1) then dir[0] := 1; {haut}
+          #77 : if (niv.tab[niv.pos[0].x + 1 ,niv.pos[0].y] > 1) then dir[0] := 2; {droite}
+          #80 : if (niv.tab[niv.pos[0].x ,niv.pos[0].y + 1] > 1) then dir[0] := 3; {bas}
+          #75 : if (niv.tab[niv.pos[0].x - 1 ,niv.pos[0].y] > 1) then dir[0] := 4; {gauche}
           'q' : fin := 1;
         end;
       end;
 
       if temps mod 3 = 0 then
       begin
-        Mouvement(niv,pos,dir,bonus);
-        Interaction(niv,pos,score,vie,bonus,fin);
-        affichage(niv,pos);
+        Mouvement(niv,dir,bonus);
+        Interaction(niv,score,vie,bonus,fin);
+        affichage(niv);
       end;
 
       delay(100);
@@ -296,9 +297,7 @@ BEGIN
     end;
 
 	if fin = 1 then
-  begin
-	  vie := vie - 1;
-  end
+	  vie := vie - 1
   else if fin = 2 then
     chargement(select,niv);
 

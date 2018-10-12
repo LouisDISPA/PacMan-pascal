@@ -15,6 +15,7 @@ TYPE
   Niveau = RECORD
     tab : array[0..49,0..49] of Byte; {( mur = 0  , porte = 1 , vide = 2 , piece = 3  , bonbon = 4 , Cerise = 5)}
     xMax, yMax : byte; { taille Max 50 sur 50 }
+    pos_start : tableauPos;
   END;
 
 
@@ -85,7 +86,7 @@ begin
   proxi := sum;
 end;
 
-function choisir_dir(n : Niveau; pos : TableauPos; i : byte): byte;
+function choisir_dir(n : Niveau; pos : TableauPos; i : byte; bonus : boolean): byte;
 var
   dir : byte;
 begin
@@ -94,7 +95,7 @@ begin
   choisir_dir := dir;
 end;
 
-procedure mouvement(n : Niveau; var pos : TableauPos; var dir : TableauDir);
+procedure mouvement(n : Niveau; var pos : TableauPos; var dir : TableauDir; bonus : boolean);
 var
   i: BYTE;
 Begin
@@ -105,7 +106,7 @@ Begin
   for i := 1 to 4 do
   begin
     if ( dir[i] = 0 ) or ( proxi(n, pos, i) > 2 ) then {si le fantome est arreté ou qu'il est dans une intersection}
-      dir[i] := choisir_dir(n, pos, i); {il réflechi pour Choisir ça direction}
+      dir[i] := choisir_dir(n, pos, i, bonus); {il réflechi pour Choisir ça direction}
       avance(n,pos,dir,i);
   end;
 end;
@@ -148,7 +149,7 @@ end;
 
 
 
-procedure chargement(niv : string; var map : Niveau;var pos : TableauPos);
+procedure chargement(niv : string; var map : Niveau);
 var
   fic : Text;
   p : byte;
@@ -188,11 +189,10 @@ begin
       for i := 0 to 5 do
       begin
         read(fic,p);
-        pos[i].x := p;
+        map.pos_start[i].x := p;
         readln(fic,P);
-        pos[i].y := p;
+        map.pos_start[i].y := p;
       end;
-
     close(fic);
    end
    else
@@ -202,13 +202,35 @@ begin
 end;
 
 
+procedure interaction(var n : niveau;var pos : tableauPos; var score : integer; var vie : byte; var bonus : boolean; var fin : byte);
+var
+  p : vect;
+  i : byte;
+begin
+  p := pos[0];
+  case n.tab[p.x, p.y] of
+    3 : score := score + 1;
+	  4 : bonus := true;
+	  5 : score := score + 100;
+  end;
+  n.tab[p.x, p.y] := 2;
+
+  for i := 1 to 4 do
+    if (p.x = pos[i].x) and (p.y = pos[i].y) then
+      if bonus then
+        pos[i] := n.pos_start[i]
+      else
+        fin := 1;
+
+end;
+
 var
   select : STRING;
   niv : Niveau;
   pos : TableauPos;
   dir : TableauDir;
-  bonus, fin : boolean;
-  vie : byte;
+  bonus : boolean;
+  vie, fin, i : byte; {fin = 0 : la partie est en cours || fin = 1 : mange par un fantome || fin = 2 : manger tout les pièces}
   temps : LONGINT;
   score : INTEGER;
   k : char;
@@ -226,42 +248,59 @@ BEGIN
   if (select = '') then
     select := 'lvl1';
 
-  chargement(select,niv,pos);
   vie := 3;
-  temps := 0;
   score := 0;
-  bonus := false;
-  fin := false;
+  chargement(select,niv);
 
   windmaxx := 50;
   windmaxy := 50;
   clrscr;
-  affichage(niv,pos);
 
-  delay(3000);
-  clrscr;
-  while not(fin) do
+  while vie <> 0 do
   begin
-    if temps mod 3 = 0 then
+    bonus := false;
+    fin := 0;
+    temps := 0;
+
+    pos := niv.pos_start;
+    for i := 0 to 4 do dir[i] := 0;
+
+    affichage(niv,pos);
+
+    delay(3000);
+
+    while fin = 0 do
     begin
-      Mouvement(niv,pos,dir);
-      {Interaction(niv,pos,score,vie,bonus,fin);}
-      affichage(niv,pos);
-    end;
 
-    if Keypressed then
-    Begin
-      k := ReadKey;
-      case k of
-        #72 : if (niv.tab[pos[0].x ,pos[0].y - 1] > 1) then dir[0] := 1; {haut}
-        #77 : if (niv.tab[pos[0].x + 1 ,pos[0].y] > 1) then dir[0] := 2; {droite}
-        #80 : if (niv.tab[pos[0].x ,pos[0].y + 1] > 1) then dir[0] := 3; {bas}
-        #75 : if (niv.tab[pos[0].x - 1 ,pos[0].y] > 1) then dir[0] := 4; {gauche}
-        'q' : fin := true;
+      if Keypressed then
+      Begin
+        k := ReadKey;
+        case k of
+          #72 : if (niv.tab[pos[0].x ,pos[0].y - 1] > 1) then dir[0] := 1; {haut}
+          #77 : if (niv.tab[pos[0].x + 1 ,pos[0].y] > 1) then dir[0] := 2; {droite}
+          #80 : if (niv.tab[pos[0].x ,pos[0].y + 1] > 1) then dir[0] := 3; {bas}
+          #75 : if (niv.tab[pos[0].x - 1 ,pos[0].y] > 1) then dir[0] := 4; {gauche}
+          'q' : fin := 1;
+        end;
       end;
+
+      if temps mod 3 = 0 then
+      begin
+        Mouvement(niv,pos,dir,bonus);
+        Interaction(niv,pos,score,vie,bonus,fin);
+        affichage(niv,pos);
+      end;
+
+      delay(100);
+      temps := temps + 1;
     end;
 
-    delay(100);
-    temps := temps + 1;
+	if fin = 1 then
+  begin
+	  vie := vie - 1;
+  end
+  else if fin = 2 then
+    chargement(select,niv);
+
   end;
 END.

@@ -213,7 +213,7 @@ begin
   case n.tab[p.x, p.y] of
     3 : score := score + 1;
 	  4 : bonus := true;
-	  5 : score := score + 100;
+	  5 : vie := vie + 1;
   end;
   n.tab[p.x, p.y] := 2;
 
@@ -223,6 +223,9 @@ begin
         n.pos[i] := n.pos_start[i]
       else
         fin := 1;
+
+  if score = 240 then
+    fin := 2;
 
 end;
 

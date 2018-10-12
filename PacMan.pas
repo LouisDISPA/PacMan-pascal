@@ -233,6 +233,9 @@ BEGIN
   bonus := false;
   fin := false;
 
+  windmaxx := 50;
+  windmaxy := 50;
+  clrscr;
   affichage(niv,pos);
 
   delay(3000);
@@ -254,6 +257,7 @@ BEGIN
         #77 : if (niv.tab[pos[0].x + 1 ,pos[0].y] > 1) then dir[0] := 2; {droite}
         #80 : if (niv.tab[pos[0].x ,pos[0].y + 1] > 1) then dir[0] := 3; {bas}
         #75 : if (niv.tab[pos[0].x - 1 ,pos[0].y] > 1) then dir[0] := 4; {gauche}
+        'q' : fin := true;
       end;
     end;
 

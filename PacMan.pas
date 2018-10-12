@@ -276,7 +276,7 @@ BEGIN
     while fin = 0 do
     begin
 
-      if Keypressed then
+      while Keypressed do
       Begin
         k := ReadKey;
         case k of

@@ -16,7 +16,7 @@ TYPE
     tab : array[0..49,0..49] of Byte; {( mur = 0  , porte = 1 , vide = 2 , piece = 3  , bonbon = 4 , Cerise = 5)}
     xMax, yMax : byte; { taille Max 50 sur 50 }
     pos_start, pos_pre, pos : tableauPos;
-    nb_piece : integer;
+    nb_piece : word;
   END;
 
 
@@ -87,7 +87,7 @@ begin
   proxi := sum;
 end;
 
-function choisir_dir(n : Niveau; i : byte; bonus : boolean): byte;
+function choisir_dir(n : Niveau; i : byte; bonus : byte): byte;
 var
   dir : byte;
 begin
@@ -96,7 +96,7 @@ begin
   choisir_dir := dir;
 end;
 
-procedure mouvement(var n : Niveau; var dir : TableauDir; bonus : boolean);
+procedure mouvement(var n : Niveau; var dir : TableauDir; bonus : byte);
 var
   i: BYTE;
 Begin
@@ -127,7 +127,7 @@ end;
 
 procedure affichage_niv(map : Niveau);
 var
-  i,j : integer;
+  i,j : byte;
   str : STRING;
 begin
   gotoXY(1,1);
@@ -143,7 +143,7 @@ begin
   gotoXY(1,map.yMax)
 end;
 
-procedure affichage_perso(n : Niveau);
+procedure affichage_perso(n : Niveau; bonus : byte);
 var
   i : byte;
 begin
@@ -162,88 +162,106 @@ begin
   for i := 1 to 4 do
   begin
     gotoXY(n.pos[i].x + 1,n.pos[i].y + 1);
-    write('M');
+    if bonus = 0 then
+      write('M')
+    else
+      write('Z');
   end;
 
-  gotoXY(1,n.yMax)
+  gotoXY(1,n.yMax);
+
 end;
 
 
 procedure chargement(niv : string; var map : Niveau);
 var
   fic : Text;
-  p : byte;
-  i, j : Integer;
+  p : word;
+  i, j : byte;
   str, name : string;
 begin
   name := niv + '.niv';
    if (FileExists(name)) then
    begin
-      assign(fic,name);
-      reset(fic);
-      read(fic,map.xMax);
-      readln(fic,map.yMax);
-      if (map.xMax > 50) or (map.yMax > 50) then
-      begin
-        writeln('Tailles invalides');
-      end;
 
-      for j := 0 to map.yMax-1 do
-      begin
-       readln(fic,str);
-       for i := 0 to map.xMax-1 do
-          if (str[i+1] = '0') then
-            map.tab[i][j] := 0
-          else if (str[i+1] = '1') then
-            map.tab[i][j] := 1
-          else if (str[i+1] = '2') then
-            map.tab[i][j] := 2
-          else if (str[i+1] = '3') then
-            map.tab[i][j] := 3
-          else if (str[i+1] = '4') then
-            map.tab[i][j] := 4
-          else
-            Write('erreur chargement tableau  ');
-      end;
+    assign(fic,name);
+    reset(fic);
+    read(fic,map.xMax);
+    readln(fic,map.yMax);
+    if (map.xMax > 50) or (map.yMax > 50) then
+    begin
+      writeln('Tailles invalides');
+    end;
 
-      for i := 0 to 5 do
-      begin
-        read(fic,p);
-        map.pos_start[i].x := p;
-        readln(fic,P);
-        map.pos_start[i].y := p;
-      end;
+    for j := 0 to map.yMax-1 do
+    begin
+     readln(fic,str);
+     for i := 0 to map.xMax-1 do
+        if (str[i+1] = '0') then
+          map.tab[i][j] := 0
+        else if (str[i+1] = '1') then
+          map.tab[i][j] := 1
+        else if (str[i+1] = '2') then
+          map.tab[i][j] := 2
+        else if (str[i+1] = '3') then
+          map.tab[i][j] := 3
+        else if (str[i+1] = '4') then
+          map.tab[i][j] := 4
+        else
+          Write('erreur chargement tableau  ');
+    end;
+
+    for i := 0 to 5 do
+    begin
+      read(fic,j);
+      map.pos_start[i].x := j;
+      readln(fic,j);
+      map.pos_start[i].y := j;
+    end;
+
+    read(fic,p);
+    map.nb_piece := p;
+
     close(fic);
-   end
-   else
-   begin
-      writeln('Erreur le fichier n''existe pas');
-   end;
+  end
+  else
+    writeln('Erreur le fichier n''existe pas');
 end;
 
 
-procedure interaction(var n : niveau; var score : integer; var vie : byte; var bonus : boolean; var fin : byte);
+procedure interaction(var n : niveau; temps : longword; var score : word; var vie : byte; var bonus : byte; var fin : byte);
 var
   p : vect;
   i : byte;
 begin
+
+  if not(bonus = 0) then
+    bonus := bonus - 1;
+
   p := n.pos[0];
   case n.tab[p.x, p.y] of
     3 : score := score + 1;
-	  4 : bonus := true;
+	  4 : bonus := 30;
 	  5 : vie := vie + 1;
   end;
   n.tab[p.x, p.y] := 2;
 
   for i := 1 to 4 do
     if (p.x = n.pos[i].x) and (p.y = n.pos[i].y) then
-      if bonus then
+      if not(bonus = 0) then
         n.pos[i] := n.pos_start[i]
       else
         fin := 1;
 
-  if score = 240 then
+  if score mod n.nb_piece = 0 then
     fin := 2;
+
+  if temps = 3*200 then
+  begin
+    n.tab[n.pos[5].x,n.pos[5].y] := 5;
+    gotoXY(n.pos[5].x+1,n.pos[5].y+1);
+    write('Q');
+  end;
 
 end;
 
@@ -251,10 +269,10 @@ var
   select : STRING;
   niv : Niveau;
   dir : TableauDir;
-  bonus : boolean;
+  bonus : byte;
   vie, fin, i : byte; {fin = 0 : la partie est en cours || fin = 1 : mange par un fantome || fin = 2 : manger tout les pièces}
-  temps : LONGINT;
-  score : INTEGER;
+  temps : LONGWORD;
+  score : word;
   k : char;
 
 BEGIN
@@ -277,6 +295,7 @@ BEGIN
   windmaxy := 50;
   clrscr;
 
+  temps := 0;
   vie := 3;
   score := 0;
   chargement(select,niv);
@@ -284,15 +303,14 @@ BEGIN
 
   while vie <> 0 do
   begin
-    bonus := false;
+    bonus := 0;
     fin := 0;
-    temps := 0;
 
     niv.pos := niv.pos_start;
     for i := 0 to 4 do dir[i] := 0;
 
     affichage_niv(niv);
-    affichage_perso(niv);
+    affichage_perso(niv, bonus);
 
     delay(3000);
 
@@ -314,8 +332,8 @@ BEGIN
       if temps mod 3 = 0 then
       begin
         Mouvement(niv,dir,bonus);
-        Interaction(niv,score,vie,bonus,fin);
-        affichage_perso(niv);
+        Interaction(niv,temps,score,vie,bonus,fin);
+        affichage_perso(niv,bonus);
       end;
 
       delay(100);
@@ -325,7 +343,10 @@ BEGIN
 	if fin = 1 then
 	  vie := vie - 1
   else if fin = 2 then
+  begin
     chargement(select,niv);
+    temps := 0;
+  end;
 
   end;
 END.

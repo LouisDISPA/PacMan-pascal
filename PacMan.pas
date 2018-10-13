@@ -15,8 +15,7 @@ TYPE
   Niveau = RECORD
     tab : array[0..49,0..49] of Byte; {( mur = 0  , porte = 1 , vide = 2 , piece = 3  , bonbon = 4 , Cerise = 5)}
     xMax, yMax : byte; { taille Max 50 sur 50 }
-    pos_start : tableauPos;
-    pos : tableauPos;
+    pos_start, pos_pre, pos : tableauPos;
     nb_piece : integer;
   END;
 
@@ -101,6 +100,7 @@ procedure mouvement(var n : Niveau; var dir : TableauDir; bonus : boolean);
 var
   i: BYTE;
 Begin
+  n.pos_pre := n.pos;
   {Mouvenement pacman}
   avance(n,dir,0);
 
@@ -113,7 +113,19 @@ Begin
   end;
 end;
 
-procedure affichage(map : Niveau);
+function symbole(a : byte): char;
+begin
+  Case a of
+    0 : symbole := '#';
+    1 : symbole := '+';
+    2 : symbole := ' ';
+    3 : symbole := '.';
+    4 : symbole := 'o';
+    5 : symbole := 'Q';
+  end;
+end;
+
+procedure affichage_niv(map : Niveau);
 var
   i,j : integer;
   str : STRING;
@@ -125,30 +137,36 @@ begin
   Begin
     str := '';
     For j:= 0 to map.xMax-1 do
-      Case map.tab[j,i] of
-        0 : str := str + '#';
-        1 : str := str + '+';
-        2 : str := str + ' ';
-        3 : str := str + '.';
-        4 : str := str + 'o';
-        5 : str := str + 'Q';
-      End;
+      str := str + symbole(map.tab[j,i]);
     writeln(str);
   end;
+  gotoXY(1,map.yMax)
+end;
+
+procedure affichage_perso(n : Niveau);
+var
+  i : byte;
+begin
 
   {affiche PacMan}
-  gotoXY(map.pos[0].x + 1,map.pos[0].y + 1);
+  for i := 0 to 4 do
+  begin
+    gotoXY(n.pos_pre[i].x + 1,n.pos_pre[i].y + 1);
+    write(symbole(n.tab[n.pos_pre[i].x,n.pos_pre[i].y]));
+  end;
+
+  gotoXY(n.pos[0].x + 1,n.pos[0].y + 1);
   write('C');
 
   {affiche les fantomes}
   for i := 1 to 4 do
   begin
-    gotoXY(map.pos[i].x + 1,map.pos[i].y + 1);
+    gotoXY(n.pos[i].x + 1,n.pos[i].y + 1);
     write('M');
   end;
-  gotoXY(1,map.yMax)
-end;
 
+  gotoXY(1,n.yMax)
+end;
 
 
 procedure chargement(niv : string; var map : Niveau);
@@ -240,8 +258,11 @@ var
   k : char;
 
 BEGIN
+
   Randomize;
   clrscr;
+  cursoroff;
+
   WriteLn('*********************************************');
   WriteLn('*** Bienvenue sur PacMan le Jeu de Pacman ***');
   WriteLn('*********************************************');
@@ -252,13 +273,14 @@ BEGIN
   if (select = '') then
     select := 'lvl1';
 
+  windmaxx := 50;
+  windmaxy := 50;
+  clrscr;
+
   vie := 3;
   score := 0;
   chargement(select,niv);
 
-  windmaxx := 50;
-  windmaxy := 50;
-  clrscr;
 
   while vie <> 0 do
   begin
@@ -269,7 +291,8 @@ BEGIN
     niv.pos := niv.pos_start;
     for i := 0 to 4 do dir[i] := 0;
 
-    affichage(niv);
+    affichage_niv(niv);
+    affichage_perso(niv);
 
     delay(3000);
 
@@ -292,7 +315,7 @@ BEGIN
       begin
         Mouvement(niv,dir,bonus);
         Interaction(niv,score,vie,bonus,fin);
-        affichage(niv);
+        affichage_perso(niv);
       end;
 
       delay(100);

@@ -143,18 +143,19 @@ begin
   gotoXY(1,map.yMax)
 end;
 
-procedure affichage_perso(n : Niveau; bonus : byte);
+procedure affichage_perso(n : Niveau; bonus : byte; vie :byte; score : word);
 var
   i : byte;
 begin
 
-  {affiche PacMan}
+  {suppretion des anciennes positions}
   for i := 0 to 4 do
   begin
     gotoXY(n.pos_pre[i].x + 1,n.pos_pre[i].y + 1);
     write(symbole(n.tab[n.pos_pre[i].x,n.pos_pre[i].y]));
   end;
 
+  {affiche PacMan}
   gotoXY(n.pos[0].x + 1,n.pos[0].y + 1);
   write('C');
 
@@ -168,8 +169,25 @@ begin
       write('Z');
   end;
 
-  gotoXY(1,n.yMax);
+  {affiche les stats}
+  gotoxy(n.xMax + 2, 2);
+  write('vie : ',vie);
 
+  gotoXY(n.xMax + 2, 4);
+  write('score : ', score);
+
+  if bonus > 1 then
+  begin
+    gotoXY(n.xMax + 2, 6);
+    WriteLn('Bonus : ', bonus-2, ' ');
+  end
+  else if bonus = 1 then
+  begin
+    gotoXY(n.xMax + 2, 6);
+    WriteLn('               ');
+  end;
+
+  gotoXY(1,n.yMax);
 end;
 
 
@@ -241,7 +259,7 @@ begin
   p := n.pos[0];
   case n.tab[p.x, p.y] of
     3 : score := score + 1;
-	  4 : bonus := 30;
+	  4 : bonus := 32;
 	  5 : vie := vie + 1;
   end;
   n.tab[p.x, p.y] := 2;
@@ -310,7 +328,7 @@ BEGIN
     for i := 0 to 4 do dir[i] := 0;
 
     affichage_niv(niv);
-    affichage_perso(niv, bonus);
+    affichage_perso(niv, bonus,vie, score);
 
     delay(3000);
 
@@ -333,7 +351,7 @@ BEGIN
       begin
         Mouvement(niv,dir,bonus);
         Interaction(niv,temps,score,vie,bonus,fin);
-        affichage_perso(niv,bonus);
+        affichage_perso(niv,bonus,vie,score);
       end;
 
       delay(100);

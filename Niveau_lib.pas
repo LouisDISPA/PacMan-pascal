@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <<<<<<< current
 unit Niveau_lib;
 
@@ -135,6 +136,8 @@ end;
 
 end.
 =======
+=======
+>>>>>>> 53d26606cff0260d707689e884a6075b031dd3f6
 unit Niveau_lib;
 
 interface
@@ -237,6 +240,7 @@ begin
     begin
      readln(fic,str);
      for i := 0 to map.xMax-1 do
+<<<<<<< HEAD
         if (str[i+1] = '#') then
           map.tab[i][j] := 0
         else if (str[i+1] = '+') then
@@ -246,6 +250,17 @@ begin
         else if (str[i+1] = '.') then
           map.tab[i][j] := 3
         else if (str[i+1] = 'o') then
+=======
+        if (str[i+1] = '0') then
+          map.tab[i][j] := 0
+        else if (str[i+1] = '1') then
+          map.tab[i][j] := 1
+        else if (str[i+1] = '2') then
+          map.tab[i][j] := 2
+        else if (str[i+1] = '3') then
+          map.tab[i][j] := 3
+        else if (str[i+1] = '4') then
+>>>>>>> 53d26606cff0260d707689e884a6075b031dd3f6
           map.tab[i][j] := 4
         else
           Write('erreur chargement tableau  ');
@@ -270,4 +285,7 @@ end;
 
 
 end.
+<<<<<<< HEAD
 >>>>>>> before discard
+=======
+>>>>>>> 53d26606cff0260d707689e884a6075b031dd3f6

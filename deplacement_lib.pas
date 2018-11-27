@@ -1,14 +1,13 @@
-<<<<<<< HEAD
 unit deplacement_lib;
 
 interface
 
-uses type_pacman;
+uses type_pacman,crt;
 
 function contact(n : Niveau; x,y : byte): boolean;
 procedure avance(var n : niveau; var dir : TableauDir; i : byte);
-function proxi(n : Niveau; i : byte): byte;
-function choisir_dir(n : Niveau; i : byte; bonus : byte): byte;
+function proxi(n : Niveau; i : byte): tableaudir;
+function choisir_dir(n : Niveau; i : byte; pro : tableaudir ;bonus : byte): byte;
 procedure mouvement(var n : Niveau; var dir : TableauDir; bonus : byte);
   
 implementation
@@ -21,11 +20,11 @@ var
 begin
   con := false;
 
-  if (n.tab[x ,y] <= 1) then {si il n'y a pas de mur ni de porte ni}
+  if (n.tab[x ,y] <= 1) then {si il y a un mur}
     con := true
   else
     for i := 1 to 4 do
-        if (n.pos[i].x = x) and (n.pos[i].y = y) then {ni de fantomes}
+        if (n.pos[i].x = x) and (n.pos[i].y = y) then {de fantomes}
           con := true;
 
   contact := con;
@@ -56,153 +55,84 @@ begin
   end;
 end;
 
-function proxi(n : Niveau; i : byte): byte;
+function proxi(n : Niveau; i : byte): TableauDir;
 var
-  sum: byte;
+  tab: tableaudir;
+  j : byte;
 begin
-  sum := 0;
+  for j := 0 to 4 do
+    tab[j] := 0;
 
   if (n.pos[i].y <> 0) then {check si extrémité (inutile si il y a bien un mur sur les bordures)}
     if not(contact(n, n.pos[i].x, n.pos[i].y - 1)) then {si il n'y a pas de mur ni de porte ni de fantome}
-      sum := sum + 1;
+      tab[1] := 1;
 
   if (n.pos[i].x <> n.xMax-1) then
     if not(contact(n, n.pos[i].x + 1, n.pos[i].y)) then
-      sum := sum + 1;
+      tab[2] := 1;
 
   if (n.pos[i].y <> n.yMax-1) then
     if not(contact(n, n.pos[i].x ,n.pos[i].y + 1)) then
-      sum := sum + 1;
+      tab[3] := 1;
 
   if (n.pos[i].x <> 0) then
     if not(contact(n, n.pos[i].x - 1 ,n.pos[i].y)) then
-      sum := sum + 1;
-
-  proxi := sum;
-end;
-
-function choisir_dir(n : Niveau; i : byte; bonus : byte): byte;
-var
-  dir : byte;
-begin
-  dir := random(4) + 1;
-
-  choisir_dir := dir;
-end;
-
-procedure mouvement(var n : Niveau; var dir : TableauDir; bonus : byte);
-var
-  i: BYTE;
-Begin
-  n.pos_pre := n.pos;
-  {Mouvenement pacman}
-  avance(n,dir,0);
-
-  {Mouvement fantomes}
-  for i := 1 to 4 do
-  begin
-    if ( dir[i] = 0 ) or ( proxi(n, i) > 2 ) then {si le fantome est arreté ou qu'il est dans une intersection}
-      dir[i] := choisir_dir(n, i, bonus); {il réflechi pour Choisir ça direction}
-      avance(n,dir,i);
-  end;
-end;
-
-end.
-=======
-unit deplacement_lib;
-
-interface
-
-uses type_pacman;
-
-function contact(n : Niveau; x,y : byte): boolean;
-procedure avance(var n : niveau; var dir : TableauDir; i : byte);
-function proxi(n : Niveau; i : byte): byte;
-function choisir_dir(n : Niveau; i : byte; bonus : byte): byte;
-procedure mouvement(var n : Niveau; var dir : TableauDir; bonus : byte);
+      tab[4] := 1;
   
-implementation
+  {check si pacman est autour}
+  if (n.pos[i].x = n.pos[0].x) and (n.pos[i].y - 1 = n.pos[0].y) then
+    tab[0] := 1
 
+  else if (n.pos[i].x + 1 = n.pos[0].x) and (n.pos[i].y = n.pos[0].y) then
+    tab[0] := 2
+    
+  else if (n.pos[i].x = n.pos[0].x) and (n.pos[i].y + 1 = n.pos[0].y) then
+    tab[0] := 3
+    
+  else if (n.pos[i].x - 1 = n.pos[0].x) and (n.pos[i].y = n.pos[0].y) then
+    tab[0] := 4;
 
-function contact(n : Niveau; x,y : byte): boolean;
-var
-  i : byte;
-  con : boolean;
-begin
-  con := false;
-
-  if (n.tab[x ,y] <= 1) then {si il n'y a pas de mur ni de porte ni}
-    con := true
-  else
-    for i := 1 to 4 do
-        if (n.pos[i].x = x) and (n.pos[i].y = y) then {ni de fantomes}
-          con := true;
-
-  contact := con;
+  proxi := tab;
 end;
 
-procedure avance(var n : niveau; var dir : TableauDir; i : byte);
+function choisir_dir(n : Niveau; i : byte; pro : tableaudir ; bonus : byte): byte;
+var
+  j, sum: byte;
+  rand, r : integer;
 begin
-  case dir[i] of
-    1 : if (n.pos[i].y <> 0) then {check si extrémité (inutile si il y a bien un mur sur les bordures)}
-      if not(contact(n, n.pos[i].x, n.pos[i].y - 1)) then {si il n'y a pas de mur ni de porte ni de fantome}
-        n.pos[i].y := n.pos[i].y - 1
-      else dir[i] := 0; {sinon il s'arrête}
 
-    2 : if (n.pos[i].x <> n.xMax-1) then
-      if not(contact(n, n.pos[i].x + 1, n.pos[i].y)) then
-        n.pos[i].x := n.pos[i].x + 1
-      else dir[i] := 0;
-
-    3 : if (n.pos[i].y <> n.yMax-1) then
-      if not(contact(n, n.pos[i].x ,n.pos[i].y + 1)) then
-        n.pos[i].y := n.pos[i].y + 1
-      else dir[i] := 0;
-
-    4 : if (n.pos[i].x <> 0) then
-      if not(contact(n, n.pos[i].x - 1 ,n.pos[i].y)) then
-        n.pos[i].x := n.pos[i].x - 1
-      else dir[i] := 0;
+  if i <> 0 then {ne peut pas se retourner}
+    pro[ ( (i+1) mod 4 ) + 1 ] := 0;
+    
+  r := (n.pos[0].x - n.pos[i].x)*(n.pos[0].x - n.pos[i].x) + (n.pos[0].y - n.pos[i].y)*(n.pos[0].y - n.pos[i].y);
+  
+  if (25 + i * 5) > r then {si pacman est dans le champ de vision}
+  begin
+  
+  
+  
   end;
-end;
-
-function proxi(n : Niveau; i : byte): byte;
-var
-  sum: byte;
-begin
+ 
   sum := 0;
-
-  if (n.pos[i].y <> 0) then {check si extrémité (inutile si il y a bien un mur sur les bordures)}
-    if not(contact(n, n.pos[i].x, n.pos[i].y - 1)) then {si il n'y a pas de mur ni de porte ni de fantome}
-      sum := sum + 1;
-
-  if (n.pos[i].x <> n.xMax-1) then
-    if not(contact(n, n.pos[i].x + 1, n.pos[i].y)) then
-      sum := sum + 1;
-
-  if (n.pos[i].y <> n.yMax-1) then
-    if not(contact(n, n.pos[i].x ,n.pos[i].y + 1)) then
-      sum := sum + 1;
-
-  if (n.pos[i].x <> 0) then
-    if not(contact(n, n.pos[i].x - 1 ,n.pos[i].y)) then
-      sum := sum + 1;
-
-  proxi := sum;
-end;
-
-function choisir_dir(n : Niveau; i : byte; bonus : byte): byte;
-var
-  dir : byte;
-begin
-  dir := random(4) + 1;
-
-  choisir_dir := dir;
+  for j := 1 to 4 do
+    sum := sum + pro[j];
+  
+  rand := random(sum);
+  
+  for j := 1 to 4 do
+  begin
+    sum := sum - pro[j];
+    if sum <= rand then
+      break;
+  end;
+  
+  choisir_dir := j;
 end;
 
 procedure mouvement(var n : Niveau; var dir : TableauDir; bonus : byte);
 var
   i: BYTE;
+  pro: tableaudir;
 Begin
   n.pos_pre := n.pos;
   {Mouvenement pacman}
@@ -211,11 +141,18 @@ Begin
   {Mouvement fantomes}
   for i := 1 to 4 do
   begin
-    if ( dir[i] = 0 ) or ( proxi(n, i) > 2 ) then {si le fantome est arreté ou qu'il est dans une intersection}
-      dir[i] := choisir_dir(n, i, bonus); {il réflechi pour Choisir ça direction}
-      avance(n,dir,i);
+    pro := proxi(n,i);
+    
+    if (bonus = 32) and (dir[i] <> 0) then
+      dir[i] := ( (dir[i]+1) mod 4 ) + 1 {changemen de direction si pacman prend un bonus}
+    else if pro[0] <> 0 then
+      dir[i] := pro[0] {si pacman est auou alors il veu le manger}
+    else if not( ( (pro[1] + pro[3] = 2) and (pro[2] + pro[4] = 0) ) or ( (pro[1] + pro[3] = 0) and (pro[2] + pro[4] = 2) ) ) or (dir[i] = 0) then{si le fantome est dans une intersection}
+    begin
+      dir[i] := choisir_dir(n, dir[i], pro, bonus); {il réflechi pour Choisir ça direction}
+    end;
+    avance(n,dir,i);
   end;
 end;
 
 end.
->>>>>>> 53d26606cff0260d707689e884a6075b031dd3f6

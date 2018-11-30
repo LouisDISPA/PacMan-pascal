@@ -7,9 +7,9 @@ uses type_pacman,crt;
 function contact(n : Niveau; x,y : byte): boolean;
 procedure avance(var n : niveau; var dir : TableauDir; i : byte);
 function proxi(n : Niveau; i : byte): tableaudir;
-function choisir_dir(n : Niveau; i : byte; pro : tableaudir ;bonus : byte): byte;
+function choisir_dir(n : Niveau; i : byte; dir : byte; pro : tableaudir ;bonus : byte): byte;
 procedure mouvement(var n : Niveau; var dir : TableauDir; bonus : byte);
-  
+
 implementation
 
 
@@ -78,54 +78,78 @@ begin
   if (n.pos[i].x <> 0) then
     if not(contact(n, n.pos[i].x - 1 ,n.pos[i].y)) then
       tab[4] := 1;
-  
+
   {check si pacman est autour}
   if (n.pos[i].x = n.pos[0].x) and (n.pos[i].y - 1 = n.pos[0].y) then
     tab[0] := 1
 
   else if (n.pos[i].x + 1 = n.pos[0].x) and (n.pos[i].y = n.pos[0].y) then
     tab[0] := 2
-    
+
   else if (n.pos[i].x = n.pos[0].x) and (n.pos[i].y + 1 = n.pos[0].y) then
     tab[0] := 3
-    
+
   else if (n.pos[i].x - 1 = n.pos[0].x) and (n.pos[i].y = n.pos[0].y) then
     tab[0] := 4;
 
   proxi := tab;
 end;
 
-function choisir_dir(n : Niveau; i : byte; pro : tableaudir ; bonus : byte): byte;
+function choisir_dir(n : Niveau; i : byte; dir : byte; pro : tableaudir ; bonus : byte): byte;
 var
   j, sum: byte;
-  rand, r : integer;
+  rand, r, r_max, p, d_max, x, y : integer;
 begin
 
-  if i <> 0 then {ne peut pas se retourner}
-    pro[ ( (i+1) mod 4 ) + 1 ] := 0;
-    
-  r := (n.pos[0].x - n.pos[i].x)*(n.pos[0].x - n.pos[i].x) + (n.pos[0].y - n.pos[i].y)*(n.pos[0].y - n.pos[i].y);
-  
-  if (25 + i * 5) > r then {si pacman est dans le champ de vision}
+  if dir <> 0 then {ne peut pas se retourner}
+    pro[ ( (dir+1) mod 4 ) + 1 ] := 0;
+
+  x := n.pos[0].x - n.pos[i].x; {fantome to pacman}
+  y := n.pos[0].y - n.pos[i].y;
+  d_max := 7 + (i-1) * 3;
+
+  r := x*x + y*y;
+  r_max := d_max * d_max;
+
+  gotoxy(45,i);
+
+  if  r_max > r then {si pacman est dans le champ de vision}
   begin
-  
-  
-  
+    p := ((r_max - r)*10) div r_max ;
+
+    if (pro[1] <> 0) and (y < 0) then
+      pro[1] := pro[1] + p ;
+
+    if (pro[2] <> 0) and (x > 0) then
+      pro[2] := pro[2] + p;
+
+    if (pro[3] <> 0) and (y > 0) then
+      pro[3] := pro[3] + p;
+
+    if (pro[4] <> 0) and (x < 0) then
+      pro[4] := pro[4] + p;
+
+    {write('R ');}
+
   end;
- 
+
+  {for j := 1 to 4 do
+      write(pro[j], ' ');
+    write('   ');}
+
   sum := 0;
   for j := 1 to 4 do
     sum := sum + pro[j];
-  
+
   rand := random(sum);
-  
+
   for j := 1 to 4 do
   begin
     sum := sum - pro[j];
     if sum <= rand then
       break;
   end;
-  
+
   choisir_dir := j;
 end;
 
@@ -142,14 +166,14 @@ Begin
   for i := 1 to 4 do
   begin
     pro := proxi(n,i);
-    
+
     if (bonus = 32) and (dir[i] <> 0) then
       dir[i] := ( (dir[i]+1) mod 4 ) + 1 {changemen de direction si pacman prend un bonus}
     else if pro[0] <> 0 then
       dir[i] := pro[0] {si pacman est auou alors il veu le manger}
     else if not( ( (pro[1] + pro[3] = 2) and (pro[2] + pro[4] = 0) ) or ( (pro[1] + pro[3] = 0) and (pro[2] + pro[4] = 2) ) ) or (dir[i] = 0) then{si le fantome est dans une intersection}
     begin
-      dir[i] := choisir_dir(n, dir[i], pro, bonus); {il réflechi pour Choisir ça direction}
+      dir[i] := choisir_dir(n, i, dir[i], pro, bonus); {il réflechi pour Choisir ça direction}
     end;
     avance(n,dir,i);
   end;

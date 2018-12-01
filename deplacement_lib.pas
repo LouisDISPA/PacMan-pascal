@@ -118,16 +118,16 @@ begin
     p := ((r_max - r)*10) div r_max ;
 
     if (pro[1] <> 0) and (y < 0) then
-      pro[1] := pro[1] + p ;
+      pro[1] := pro[1] + ((d_max*(1+p)) div(d_max-abs(x)+1));
 
     if (pro[2] <> 0) and (x > 0) then
-      pro[2] := pro[2] + p;
+      pro[2] := pro[2] + ((d_max*(1+p)) div(d_max-abs(y)+1));
 
     if (pro[3] <> 0) and (y > 0) then
-      pro[3] := pro[3] + p;
+      pro[3] := pro[3] + ((d_max*(1+p)) div(d_max-abs(x)+1));
 
     if (pro[4] <> 0) and (x < 0) then
-      pro[4] := pro[4] + p;
+      pro[4] := pro[4] + ((d_max*(1+p)) div(d_max-abs(y)+1));
 
     {write('R ');}
 

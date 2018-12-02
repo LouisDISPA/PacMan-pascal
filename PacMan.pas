@@ -27,6 +27,8 @@ BEGIN
   if (select = '') then
     select := 'lvl1';
 
+  InitKeyBoard;
+
   windmaxx := 50;
   windmaxy := 50;
   clrscr;
@@ -56,10 +58,10 @@ BEGIN
         k := GetKeyEvent;
 
       case k of
-        50339393 : if (niv.tab[niv.pos[0].x ,niv.pos[0].y - 1] > 1) then dir[0] := 1; {haut}
-        50343491 : if (niv.tab[niv.pos[0].x + 1 ,niv.pos[0].y] > 1) then dir[0] := 2; {droite}
-        50344002 : if (niv.tab[niv.pos[0].x ,niv.pos[0].y + 1] > 1) then dir[0] := 3; {bas}
-        50339908 : if (niv.tab[niv.pos[0].x - 1 ,niv.pos[0].y] > 1) then dir[0] := 4; {gauche}
+        50339393,50350080 : if (niv.tab[niv.pos[0].x ,niv.pos[0].y - 1] > 1) then dir[0] := 1; {haut}
+        50343491,50351360 : if (niv.tab[niv.pos[0].x + 1 ,niv.pos[0].y] > 1) then dir[0] := 2; {droite}
+        50344002,50352128 : if (niv.tab[niv.pos[0].x ,niv.pos[0].y + 1] > 1) then dir[0] := 3; {bas}
+        50339908,50350848 : if (niv.tab[niv.pos[0].x - 1 ,niv.pos[0].y] > 1) then dir[0] := 4; {gauche}
         50335857 : fin := 1;
       end;
       if k <> 0 then

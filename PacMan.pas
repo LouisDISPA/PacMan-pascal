@@ -3,42 +3,28 @@ PROGRAM pacman;
 uses crt, keyboard, sysutils, type_pacman, Niveau_lib, deplacement_lib, interaction_lib;
 
 var
-  select : STRING;
+  nom_niv : STRING;
   niv : Niveau;
   dir : TableauDir;
   bonus : byte;
   vie, fin, i : byte; {fin = 0 : la partie est en cours || fin = 1 : mange par un fantome || fin = 2 : manger tout les pièces}
   temps, k : LONGWORD;
   score : word;
+  aventure : boolean;
 
 BEGIN
+  {menu de choix du type de jeu}
+  Menu(aventure);
 
-  Randomize;
-  clrscr;
-  cursoroff;
 
-  WriteLn('*********************************************');
-  WriteLn('*** Bienvenue sur PacMan le Jeu de Pacman ***');
-  WriteLn('*********************************************');
-  WriteLn();
-  WriteLn('Choisis le niveau du jeu :');
-  ReadLn(select);
-
-  if (select = '') then
-    select := 'lvl1';
-
-  InitKeyBoard;
-
-  windmaxx := 50;
-  windmaxy := 50;
-  clrscr;
-
+  {initialisation des parametre de jeu et du niveau}
+  nom_niv := 'lvl1';
   temps := 0;
   vie := 3;
   score := 0;
-  chargement(select,niv);
+  chargement(nom_niv,niv);
 
-
+  {boucle principale du jeu (tant que le joueur à des vies) }
   repeat
     bonus := 0;
     fin := 0;
@@ -51,10 +37,12 @@ BEGIN
 
     delay(3000);
 
+    {boucle pour 1 vie (on en sort si le joueur meurt ou gagne)}
     while fin = 0 do
     begin
 
-      while Keypressed do {traitement des inputs} { possible avec if mais moins bon}
+      {traitement des inputs}
+      while Keypressed do
         k := GetKeyEvent;
 
       case k of
@@ -78,11 +66,12 @@ BEGIN
       temps := temps + 1;
     end;
 
+    {traitement de la cause de la fin}
   	if fin = 1 then
   	  vie := vie - 1
     else if fin = 2 then
     begin
-      chargement(select,niv);
+      chargement(nom_niv,niv);
       temps := 0;
     end;
 

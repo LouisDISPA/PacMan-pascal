@@ -1,14 +1,21 @@
 PROGRAM test;
 
 USES
-  crt;
+  crt, keyboard;
 
 var
   x,y, r, r_max, p, d_max, i, j : integer;
-
+  k : longword;
 BEGIN
-
+  InitKeyBoard;
   clrscr;
+
+  k := GetKeyEvent;
+  writeln(k);
+  k := GetKeyEvent;
+  writeln(k);
+
+
   for i := 1 to 21 do
   begin
     for j := 1 to 21 do

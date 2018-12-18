@@ -13,17 +13,15 @@ implementation
 procedure affichage_niv(map : Niveau);
 var
   i,j : byte;
-  str : STRING;
 begin
   gotoXY(1,1);
 
   {affiche le tableau}
   For i:= 0 to map.yMax-1 do
   Begin
-    str := '';
     For j:= 0 to map.xMax-1 do
-      str := str + symbole(map.tab[j,i]);
-    writeln(str);
+      write( symbole(map.tab[j,i]) );
+    writeln();
   end;
   gotoXY(1,map.yMax)
 end;
@@ -42,6 +40,7 @@ begin
 
   {affiche PacMan}
   gotoXY(n.pos[0].x + 1,n.pos[0].y + 1);
+  textcolor(Yellow);
   write('C');
 
   {affiche les fantomes}
@@ -49,10 +48,18 @@ begin
   begin
     gotoXY(n.pos[i].x + 1,n.pos[i].y + 1);
     if bonus = 0 then
-      write('M')
+    begin
+      textcolor(Lightgreen);
+      write('M');
+    end
     else
+    begin
+      textcolor(green);
       write('Z');
+    end;
   end;
+
+  textcolor(white);
 
   {affiche les stats}
   gotoxy(n.xMax + 2, 2);

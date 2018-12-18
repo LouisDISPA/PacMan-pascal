@@ -2,6 +2,8 @@ unit type_pacman;
 
 interface
 
+uses crt;
+
 TYPE
   Vect = RECORD
     x,y : Byte;
@@ -24,6 +26,15 @@ implementation
 
 function symbole(a : byte): char;
 begin
+  Case a of
+    0 : textcolor(blue);
+    1 : textcolor(blue);
+    2 : textcolor(white);
+    3 : textcolor(Yellow);
+    4 : textcolor(Yellow);
+    5 : textcolor(lightred);
+  end;
+
   Case a of
     0 : symbole := '#';
     1 : symbole := '+';

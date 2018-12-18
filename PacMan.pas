@@ -7,9 +7,9 @@ var
   niv : Niveau;
   dir : TableauDir;
   bonus : byte;
-  vie, fin, i : byte; {fin = 0 : la partie est en cours || fin = 1 : mange par un fantome || fin = 2 : manger tout les pièces}
+  vie, fin, i, nb_niv : byte; {fin = 0 : la partie est en cours || fin = 1 : mange par un fantome || fin = 2 : manger tout les pièces}
   temps, k : LONGWORD;
-  score : word;
+  score, score_total : word;
   aventure : boolean;
 
 BEGIN
@@ -18,14 +18,20 @@ BEGIN
 
 
   {initialisation des parametre de jeu et du niveau}
-  nom_niv := 'lvl1';
+  nom_niv := 'lvl';
+  nb_niv := 1;
   temps := 0;
+  fin := 0;
   vie := 3;
   score := 0;
-  chargement(nom_niv,niv);
+  score_total := 0;
 
   {boucle principale du jeu (tant que le joueur à des vies) }
   repeat
+
+    if fin <> 1 then
+      chargement(nom_niv + inttostr(nb_niv),niv);
+
     bonus := 0;
     fin := 0;
 
@@ -71,10 +77,16 @@ BEGIN
   	  vie := vie - 1
     else if fin = 2 then
     begin
-      chargement(nom_niv,niv);
+      if aventure then
+        nb_niv := nb_niv + 1;
       temps := 0;
+      score_total := score_total + score;
+      score := 0;
     end;
 
-  until (vie = 0);
+  until (vie = 0) or (nb_niv = 2);
+
+  score_total := score_total + score;
+  score := 0;
 
 END.

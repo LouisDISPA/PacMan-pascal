@@ -37,7 +37,7 @@ begin
       else
         fin := 1;
 
-  if score mod n.nb_piece = 0 then
+  if score = n.nb_piece then
     fin := 2;
 
   if temps = 3*200 then

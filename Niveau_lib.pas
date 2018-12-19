@@ -47,16 +47,18 @@ begin
   for i := 1 to 4 do
   begin
     gotoXY(n.pos[i].x + 1,n.pos[i].y + 1);
-    if bonus = 0 then
-    begin
-      textcolor(Lightgreen);
-      write('M');
-    end
-    else
-    begin
-      textcolor(green);
-      write('Z');
+
+    case i of
+      1 : textcolor(lightred);
+      2 : textcolor(lightcyan);
+      3 : textcolor(lightgreen);
+      4 : textcolor(lightMagenta);
     end;
+
+    if bonus = 0 then
+      write('M')
+    else
+      write('Z');
   end;
 
   textcolor(white);
@@ -90,7 +92,7 @@ var
   i, j : byte;
   str, name : string;
 begin
-  name := niv + '.niv';
+  name := 'ressource/' + niv + '.niv';
    if (FileExists(name)) then
    begin
 
@@ -107,18 +109,7 @@ begin
     begin
      readln(fic,str);
      for i := 0 to map.xMax-1 do
-        if (str[i+1] = '0') then
-          map.tab[i][j] := 0
-        else if (str[i+1] = '1') then
-          map.tab[i][j] := 1
-        else if (str[i+1] = '2') then
-          map.tab[i][j] := 2
-        else if (str[i+1] = '3') then
-          map.tab[i][j] := 3
-        else if (str[i+1] = '4') then
-          map.tab[i][j] := 4
-        else
-          Write('erreur chargement tableau  ');
+        map.tab[i][j] := strtoint(str[i+1]);
     end;
 
     for i := 0 to 5 do

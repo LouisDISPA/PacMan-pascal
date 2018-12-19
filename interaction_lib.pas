@@ -62,21 +62,25 @@ begin
 
   choix := true;
 
-  textcolor(Blue);
+  textcolor(lightblue);
   WriteLn('*********************************************');
   Write('*** ');
   textcolor(Yellow);
   Write('Bienvenue sur PacMan le Jeu de Pacman');
-  textcolor(Blue);
+  textcolor(lightblue);
   WriteLn(' ***');
   WriteLn('*********************************************');
   WriteLn();
   WriteLn('          Choisis le mode du jeu :           ');
   WriteLn();
-  textcolor(Lightblue);
-  WriteLn('                -Aventure-                   ');
   textcolor(blue);
+  WriteLn('                -Aventure-                   ');
+  textcolor(lightblue);
   WriteLn('                 Endurance                   ');
+  WriteLn();
+  WriteLn();
+  textcolor(blue);
+  WriteLn('Q : exit');
 
   repeat
     k := GetKeyEvent;
@@ -84,23 +88,25 @@ begin
     if choix and ( (k = 50344002) or (k = 50352128) ) then
     begin
       gotoXY(17,7);
-      textcolor(blue);
+      textcolor(Lightblue);
       Write(' Aventure ');
       gotoXY(17,8);
-      textcolor(Lightblue);
+      textcolor(blue);
       Write('-Endurance-');
       choix := false;
     end
     else if not(choix) and ( (k = 50339393) or (k = 50350080) ) then
     begin
       gotoXY(17,7);
-      textcolor(Lightblue);
+      textcolor(blue);
       Write('-Aventure-');
       gotoXY(17,8);
-      textcolor(blue);
+      textcolor(Lightblue);
       Write(' Endurance ');
       choix := true;
-    end
+    end;
+    if k = 50335857 then
+      halt;
 
   until (k = 50338829);
 

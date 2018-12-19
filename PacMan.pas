@@ -13,6 +13,7 @@ var
 BEGIN
 
   repeat
+  
     {menu de choix du type de jeu}
     Menu(aventure);
 

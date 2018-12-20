@@ -14,6 +14,7 @@ procedure affichage_niv(map : Niveau);
 var
   i,j : byte;
 begin
+  clrscr;
   gotoXY(1,1);
 
   {affiche le tableau}
@@ -64,16 +65,16 @@ begin
   textcolor(white);
 
   {affiche les stats}
-  gotoxy(n.xMax + 2, 2);
-  write('vie : ',vie);
+  gotoxy(n.xMax + 1, 2);
+  write(' vie : ',vie);
 
-  gotoXY(n.xMax + 2, 4);
-  write('score : ', score);
+  gotoXY(n.xMax + 1, 4);
+  write(' score : ', score);
 
   if bonus > 1 then
   begin
-    gotoXY(n.xMax + 2, 6);
-    WriteLn('Bonus : ', bonus-2, ' ');
+    gotoXY(n.xMax + 1, 6);
+    WriteLn(' Bonus : ', bonus-2, ' ');
   end
   else if bonus = 1 then
   begin

@@ -63,7 +63,7 @@ begin
   for j := 0 to 4 do
     tab[j] := 0;
 
-  if (n.pos[i].y <> 0) then {check si extrémité (inutile si il y a bien un mur sur les bordures)}
+  if (n.pos[i].y <> 0) then {check si extrémité du tableau (inutile si il y a bien un mur sur les bords)}
     if not(contact(n, n.pos[i].x, n.pos[i].y - 1)) then {si il n'y a pas de mur ni de porte ni de fantome}
       tab[1] := 1;
 
@@ -170,7 +170,7 @@ Begin
     if (bonus = 32) and (dir[i] <> 0) then
       dir[i] := ( (dir[i]+1) mod 4 ) + 1 {changemen de direction si pacman prend un bonus}
     else if pro[0] <> 0 then
-      dir[i] := pro[0] {si pacman est auou alors il veu le manger}
+      dir[i] := pro[0] {si pacman est autour(à une case) alors il veut le manger}
     else if not( ( (pro[1] + pro[3] = 2) and (pro[2] + pro[4] = 0) ) or ( (pro[1] + pro[3] = 0) and (pro[2] + pro[4] = 2) ) ) or (dir[i] = 0) then{si le fantome est dans une intersection}
     begin
       dir[i] := choisir_dir(n, i, dir[i], pro, bonus); {il réflechi pour Choisir ça direction}

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.sound.min.js"></script>
+    <meta charset="utf-8" />
+
+  </head>
+  <body>
+    <style>
+      html, body {
+  margin: 0;
+  padding: 0;
+}
+canvas {
+  display: block;
+}
+    </style>
+    <script>
+let a;
+let nbx;
+let nby;
+let tab;
+let lastKey;
+let pos;
+
+var box1 = document.createElement("input");
+box1.type = "number";
+box1.value = 40;
+document.body.appendChild(box1);
+
+var box2 = document.createElement("input");
+box2.type = "number";
+box2.value = 10;
+document.body.appendChild(box2);
+
+var box3 = document.createElement("input");
+box3.type = "number";
+box3.value = 10;
+document.body.appendChild(box3);
+
+
+function setup() {
+
+	a = box1.value;
+	nbx = box2.value;
+	nby = box3.value;
+	tab = [];
+	lastKey = 2;
+	pos = [];
+
+	createCanvas(a * nbx, a* nby + 2*a);
+	for (var i = 0; i < nbx; i++) {
+		for (var j = 0; j < nby; j++) {
+			tab.push(0);
+		}
+
+	}
+	for (i = 0; i < 6; i++) {
+		pos[i] = createVector(-1, -1)
+	}
+}
+
+function savefunc() {
+
+   let strings = [];
+   let sum = 0;
+   let lin = '';
+
+   lin = nbx + ' ' + nby;
+   strings.push(lin);
+
+   for (var j = 0; j < nby; j++) {
+     lin = '';
+     for (var i = 0; i < nbx; i++) {
+       lin += tab[i + j * nbx];
+       if (tab[i + j * nbx] == 3) sum++;
+     }
+     strings.push(lin);
+   }
+
+   for (var i = 0; i < 6; i++) {
+     lin = pos[i].x + ' ' + pos[i].y;
+     strings.push(lin);
+   }
+
+   strings.push(sum);
+
+
+
+   save(strings, 'lvl', 'niv');
+}
+
+function draw() {
+	background(224);
+	drawTab();
+	checkKey();
+}
+
+function checkKey() {
+	let x = floor(mouseX / a);
+	let y = floor(mouseY / a);
+	if (mouseX < width && mouseX > 0 && mouseY < nby*a && mouseY > 0) {
+		if (keyIsDown(65)) {
+			lastKey = 0;
+		} else if (keyIsDown(90)) {
+			lastKey = 2;
+		} else if (keyIsDown(69)) {
+			lastKey = 3;
+		} else if (keyIsDown(82)) {
+			lastKey = 4;
+		} else if (keyIsDown(81)) {
+			lastKey = 5;
+		} else if (mouseIsPressed) {
+			tab[x + y * nbx] = lastKey;
+		} else if (keyIsDown(96)) {
+			pos[0].x = x;
+			pos[0].y = y;
+			tab[x + y * nbx] = 2;
+		} else if (keyIsDown(97)) {
+			pos[1].x = x;
+			pos[1].y = y;
+			tab[x + y * nbx] = 2;
+		} else if (keyIsDown(98)) {
+			pos[2].x = x;
+			pos[2].y = y;
+			tab[x + y * nbx] = 2;
+		} else if (keyIsDown(99)) {
+			pos[3].x = x;
+			pos[3].y = y;
+			tab[x + y * nbx] = 2;
+		} else if (keyIsDown(100)) {
+			pos[4].x = x;
+			pos[4].y = y;
+			tab[x + y * nbx] = 2;
+		} else if (keyIsDown(101)) {
+			pos[5].x = x;
+			pos[5].y = y;
+			tab[x + y * nbx] = 2;
+		}
+	}
+}
+
+function drawTab() {
+	for (var i = 0; i < nbx; i++) {
+		for (var j = 0; j < nby; j++) {
+
+			if (tab[i + j * nbx] == 0) {
+				fill(100);
+				stroke(255);
+				rect(i * a, j * a, a, a);
+			} else if (tab[i + j * nbx] == 2) {
+				fill(0);
+				stroke(255);
+				rect(i * a, j * a, a, a);
+			} else if (tab[i + j * nbx] == 3) {
+				fill(0);
+				stroke(255);
+				rect(i * a, j * a, a, a);
+				fill(255);
+				ellipse(i * a + a / 2, j * a + a / 2, a / 8, a / 8);
+			} else if (tab[i + j * nbx] == 4) {
+				fill(0);
+				stroke(255);
+				rect(i * a, j * a, a, a);
+				fill(255);
+				rect(i * a + a / 2 - a / 8, j * a + a / 2 - a / 8, a / 4, a / 4);
+			}
+
+		}
+	}
+
+	let my = nby* a + a/4;
+
+	fill(100);
+	if (lastKey == 0) {
+		stroke(0,255,0);
+	} else {
+		noStroke();
+	}
+	rect(a / 2, my, a, a);
+	noStroke();
+	fill(0);
+	textSize(a);
+	text('a', a*4/5, nby* a + a*9/5 );
+
+	fill(0);
+	if (lastKey == 2) {
+		stroke(0,255,0);
+	} else {
+		noStroke();
+	}
+	rect(a * 5 / 2, my, a, a);
+	noStroke();
+	fill(0);
+	textSize(a);
+	text('z', a*4/5 + a * 2, nby* a + a*9/5 );
+
+	fill(0);
+	if (lastKey == 3) {
+		stroke(0,255,0);
+	} else {
+		noStroke();
+	}
+	rect(a * 9 / 2, my, a, a);
+	noStroke();
+	fill(255);
+	stroke(255);
+	ellipse(a * 9 / 2 + a / 2, my + a / 2, a / 8, a / 8);
+	noStroke();
+	fill(0);
+	textSize(a);
+	text('e', a*4/5 + a * 4, nby* a + a*9/5 );
+
+	fill(0);
+	if (lastKey == 4) {
+		stroke(0,255,0);
+	} else {
+		noStroke();
+	}
+	rect(a * 13 / 2, my, a, a);
+	noStroke();
+	fill(255);
+	stroke(255);
+	rect(a * 13 / 2 + a / 2 - a / 8, my + a / 2 - a / 8, a / 4, a / 4);
+	noStroke();
+	fill(0);
+	textSize(a);
+	text('r', a*4/5 + a * 6, nby* a + a*9/5 );
+
+
+
+	fill(255);
+	textSize(a);
+	text('C', pos[0].x * a, (pos[0].y + 1) * a);
+
+	for (i = 1; i < 5; i++) {
+		fill(255);
+		textSize(a);
+		text('M', pos[i].x * a, (pos[i].y + 1) * a);
+	}
+
+	fill(237, 34, 93);
+	noStroke();
+	ellipse(pos[5].x * a + a / 2, pos[5].y * a + a / 2, a / 2, a / 2);
+
+}
+    </script>
+    <button onclick="setup()">Upgrade</button>
+    <button onclick="savefunc()">Save</button>
+  </body>
+</html>

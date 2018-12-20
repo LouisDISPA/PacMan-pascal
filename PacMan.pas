@@ -1,6 +1,6 @@
 PROGRAM pacman;
 
-uses crt, keyboard, sysutils, type_pacman, Niveau_lib, deplacement_lib, interaction_lib, TableauScore_lib;
+uses crt, keyboard, sysutils, type_pacman, Niveau_lib, deplacement_lib, interaction_lib;
 
 var
   niv : Niveau;
@@ -13,7 +13,7 @@ var
 BEGIN
 
   repeat
-  
+
     {menu de choix du type de jeu}
     Menu(aventure);
 
@@ -39,7 +39,7 @@ BEGIN
       for i := 0 to 4 do dir[i] := 0;
 
       affichage_niv(niv);
-      affichage_perso(niv, bonus,vie, score);
+      affichage_perso(niv, bonus,vie, score + score_total);
 
       delay(3000);
 
@@ -68,7 +68,7 @@ BEGIN
           affichage_perso(niv,bonus,vie,score);
         end;
 
-        delay(100);
+        delay(70);
         temps := temps + 1;
       end;
 
@@ -84,7 +84,7 @@ BEGIN
         score := 0;
       end;
 
-    until (vie = 0) or (nb_niv = 2);
+    until (vie = 0) or (nb_niv = 6);
 
     score_total := score_total + score;
     score := 0;

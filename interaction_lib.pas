@@ -33,7 +33,7 @@ begin
   if pos <> 0 then
   begin
 
-    WriteLn('Bien joué ! Tu es dans les 10 meilleurs joueurs. Quel est ton nom ?');
+    WriteLn('Bien joue ! Tu es dans les 10 meilleurs joueurs. Quel est ton nom ?');
     donekeyboard;
     ReadLn(j.nom);
     InitKeyBoard;
